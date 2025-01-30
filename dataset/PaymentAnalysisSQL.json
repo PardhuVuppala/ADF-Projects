@@ -1,0 +1,44 @@
+{
+	"name": "PaymentAnalysisSQL",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "SQLconnect",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "payment_method",
+				"type": "varchar"
+			},
+			{
+				"name": "Year",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Total Amount",
+				"type": "decimal",
+				"precision": 18,
+				"scale": 2
+			},
+			{
+				"name": "No of times used",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "avg usage",
+				"type": "decimal",
+				"precision": 18,
+				"scale": 2
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "PaymentAnalysis"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

@@ -1,0 +1,55 @@
+{
+	"name": "ProductsSQL",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "SQLconnect",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "brand_name",
+				"type": "varchar"
+			},
+			{
+				"name": "id",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "model_name",
+				"type": "varchar"
+			},
+			{
+				"name": "offer_name",
+				"type": "varchar"
+			},
+			{
+				"name": "price",
+				"type": "decimal",
+				"precision": 10,
+				"scale": 2
+			},
+			{
+				"name": "rating",
+				"type": "decimal",
+				"precision": 2,
+				"scale": 1
+			},
+			{
+				"name": "type",
+				"type": "varchar"
+			},
+			{
+				"name": "url",
+				"type": "varchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "Products"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

@@ -1,0 +1,45 @@
+{
+	"name": "AverageRevenueSQL",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "SQLConnection",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "year",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "month",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "quarter",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "revenue",
+				"type": "decimal",
+				"precision": 18,
+				"scale": 2
+			},
+			{
+				"name": "avgrevenue",
+				"type": "decimal",
+				"precision": 18,
+				"scale": 2
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "AverageRevenue"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

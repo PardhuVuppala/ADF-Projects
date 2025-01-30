@@ -1,0 +1,60 @@
+{
+	"name": "dataflow2",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "TranactionCount",
+						"type": "DatasetReference"
+					},
+					"name": "TranactionCount"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "Transactionsss",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "aggregate1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          customer_id as string,",
+				"          {first name} as string,",
+				"          {last name} as string,",
+				"          email as string,",
+				"          DOB as string,",
+				"          address as string,",
+				"          city as string,",
+				"          region as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> TranactionCount",
+				"TranactionCount aggregate(groupBy(customer_id),",
+				"     TotalCount = count(customer_id)) ~> aggregate1",
+				"aggregate1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          brand_name as string,",
+				"          id as string,",
+				"          model_name as string,",
+				"          price as string,",
+				"          type as string,",
+				"          url as string",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sink1"
+			]
+		}
+	}
+}

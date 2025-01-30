@@ -1,0 +1,74 @@
+{
+	"name": "ProductAnalysisBlob",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureBlobStorage3",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": "ProductAnalysis",
+				"folderPath": "output",
+				"container": "deevolvecontainer"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "product_id",
+				"type": "String"
+			},
+			{
+				"name": "2022",
+				"type": "String"
+			},
+			{
+				"name": "2023",
+				"type": "String"
+			},
+			{
+				"name": "2024",
+				"type": "String"
+			},
+			{
+				"name": "brand_name",
+				"type": "String"
+			},
+			{
+				"name": "id",
+				"type": "String"
+			},
+			{
+				"name": "model_name",
+				"type": "String"
+			},
+			{
+				"name": "price",
+				"type": "String"
+			},
+			{
+				"name": "type",
+				"type": "String"
+			},
+			{
+				"name": "url",
+				"type": "String"
+			},
+			{
+				"name": "offer_name",
+				"type": "String"
+			},
+			{
+				"name": "rating",
+				"type": "String"
+			}
+		]
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

@@ -1,0 +1,119 @@
+{
+	"name": "MonthlyRevenue",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "TransactionsInput",
+						"type": "DatasetReference"
+					},
+					"name": "Transactions"
+				},
+				{
+					"dataset": {
+						"referenceName": "ProductsInput",
+						"type": "DatasetReference"
+					},
+					"name": "Products"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "output_data",
+						"type": "DatasetReference"
+					},
+					"name": "MonthlyOutput"
+				}
+			],
+			"transformations": [
+				{
+					"name": "AddingYear"
+				},
+				{
+					"name": "cast1"
+				},
+				{
+					"name": "GroupByYear"
+				},
+				{
+					"name": "TransAndProdJoin"
+				},
+				{
+					"name": "TotalAmount"
+				},
+				{
+					"name": "cast2"
+				},
+				{
+					"name": "YearAndMonthSort"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          order_id as string,",
+				"          transaction_id as string,",
+				"          customer_id as string,",
+				"          product_id as string,",
+				"          store_id as string,",
+				"          quantity as string,",
+				"          order_date as string,",
+				"          payment_method as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> Transactions",
+				"source(output(",
+				"          brand_name as string,",
+				"          id as string,",
+				"          model_name as string,",
+				"          price as string,",
+				"          type as string,",
+				"          url as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> Products",
+				"cast1 derive(Year = year(order_date),",
+				"          Month = month(order_date)) ~> AddingYear",
+				"Transactions cast(output(",
+				"          quantity as integer '000',",
+				"          order_date as date 'yyyy-MM-dd'",
+				"     ),",
+				"     errors: true) ~> cast1",
+				"TotalAmount aggregate(groupBy(Year,",
+				"          Month),",
+				"     {No of Products sold} = sum(quantity),",
+				"          {Monthly Revenue} = sum({Total Amount})) ~> GroupByYear",
+				"AddingYear, cast2 join(product_id == id,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> TransAndProdJoin",
+				"TransAndProdJoin derive({Total Amount} = multiply(quantity,price)) ~> TotalAmount",
+				"Products cast(output(",
+				"          price as integer '000'",
+				"     ),",
+				"     errors: true) ~> cast2",
+				"GroupByYear sort(asc(Year, true),",
+				"     asc(Month, true)) ~> YearAndMonthSort",
+				"YearAndMonthSort sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          brand_name as string,",
+				"          id as string,",
+				"          model_name as string,",
+				"          price as string,",
+				"          type as string,",
+				"          url as string",
+				"     ),",
+				"     partitionFileNames:['MonthlyRevenue'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> MonthlyOutput"
+			]
+		}
+	}
+}

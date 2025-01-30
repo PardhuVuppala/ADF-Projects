@@ -1,0 +1,75 @@
+{
+	"name": "ProductAnalysis",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "SQLconnect",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "product_id",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "2022",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "2023",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "2024",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "brand_name",
+				"type": "varchar"
+			},
+			{
+				"name": "id",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "model_name",
+				"type": "varchar"
+			},
+			{
+				"name": "price",
+				"type": "decimal",
+				"precision": 10,
+				"scale": 2
+			},
+			{
+				"name": "type",
+				"type": "varchar"
+			},
+			{
+				"name": "url",
+				"type": "varchar"
+			},
+			{
+				"name": "offer_name",
+				"type": "varchar"
+			},
+			{
+				"name": "rating",
+				"type": "decimal",
+				"precision": 3,
+				"scale": 2
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "ProductAnalysis"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

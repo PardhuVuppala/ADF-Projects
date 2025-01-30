@@ -1,0 +1,39 @@
+{
+	"name": "MonthlyRevenueSQL2",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "SQLconnect",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "Year",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Month",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "No of Products sold",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Monthly Revenue",
+				"type": "decimal",
+				"precision": 18,
+				"scale": 2
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "MonthlyRevenue"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

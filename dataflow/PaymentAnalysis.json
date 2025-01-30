@@ -1,0 +1,112 @@
+{
+	"name": "PaymentAnalysis",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "TransactionsInput",
+						"type": "DatasetReference"
+					},
+					"name": "Transactions"
+				},
+				{
+					"dataset": {
+						"referenceName": "ProductsInput",
+						"type": "DatasetReference"
+					},
+					"name": "Products"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "output_data",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "join1"
+				},
+				{
+					"name": "cast1"
+				},
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "aggregate1"
+				},
+				{
+					"name": "sort1"
+				},
+				{
+					"name": "avgusage"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          order_id as string,",
+				"          transaction_id as string,",
+				"          customer_id as string,",
+				"          product_id as string,",
+				"          store_id as string,",
+				"          quantity as string,",
+				"          order_date as string,",
+				"          payment_method as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> Transactions",
+				"source(output(",
+				"          brand_name as string,",
+				"          id as string,",
+				"          model_name as string,",
+				"          price as string,",
+				"          type as string,",
+				"          url as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> Products",
+				"Transactions, Products join(product_id == id,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> join1",
+				"join1 cast(output(",
+				"          quantity as integer '000',",
+				"          order_date as date 'yyyy-MM-dd',",
+				"          price as integer '000'",
+				"     ),",
+				"     errors: true) ~> cast1",
+				"cast1 derive(Amount = multiply(quantity,price),",
+				"          Year = year(order_date)) ~> derivedColumn1",
+				"derivedColumn1 aggregate(groupBy(payment_method,",
+				"          Year),",
+				"     {Total Amount} = sum(Amount),",
+				"          {No of times used} = count(order_id)) ~> aggregate1",
+				"aggregate1 sort(asc(Year, true)) ~> sort1",
+				"sort1 derive({avg usage} = divide({No of times used}, 4)) ~> avgusage",
+				"avgusage sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          brand_name as string,",
+				"          id as string,",
+				"          model_name as string,",
+				"          price as string,",
+				"          type as string,",
+				"          url as string",
+				"     ),",
+				"     partitionFileNames:['PaymentAnalysis'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> sink1"
+			]
+		}
+	}
+}

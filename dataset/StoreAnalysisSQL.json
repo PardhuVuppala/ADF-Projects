@@ -1,0 +1,64 @@
+{
+	"name": "StoreAnalysisSQL",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "SQLconnect",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "store_id",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "quantity",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "No of Transactions",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Revenue",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "city",
+				"type": "varchar"
+			},
+			{
+				"name": "latitude",
+				"type": "decimal",
+				"precision": 10,
+				"scale": 7
+			},
+			{
+				"name": "longitude",
+				"type": "decimal",
+				"precision": 10,
+				"scale": 7
+			},
+			{
+				"name": "name",
+				"type": "varchar"
+			},
+			{
+				"name": "rating",
+				"type": "decimal",
+				"precision": 2,
+				"scale": 1
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "StoreAnalysis"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

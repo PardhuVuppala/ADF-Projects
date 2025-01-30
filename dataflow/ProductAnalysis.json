@@ -1,0 +1,108 @@
+{
+	"name": "ProductAnalysis",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "TransactionsInput",
+						"type": "DatasetReference"
+					},
+					"name": "Transactions"
+				},
+				{
+					"dataset": {
+						"referenceName": "ProductsInput",
+						"type": "DatasetReference"
+					},
+					"name": "Products"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "output_data",
+						"type": "DatasetReference"
+					},
+					"name": "ProductsInsight"
+				}
+			],
+			"transformations": [
+				{
+					"name": "ProductAggregate"
+				},
+				{
+					"name": "QuantityCast"
+				},
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "pivot1"
+				},
+				{
+					"name": "ProdNameJoin"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          order_id as string,",
+				"          transaction_id as string,",
+				"          customer_id as string,",
+				"          product_id as string,",
+				"          store_id as string,",
+				"          quantity as string,",
+				"          order_date as date 'yyyy-MM-dd',",
+				"          payment_method as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> Transactions",
+				"source(output(",
+				"          brand_name as string,",
+				"          id as string,",
+				"          model_name as string,",
+				"          price as string,",
+				"          type as string,",
+				"          url as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> Products",
+				"derivedColumn1 aggregate(groupBy(product_id,",
+				"          year,",
+				"          quarter),",
+				"     {No of times sold} = sum(quantity)) ~> ProductAggregate",
+				"Transactions cast(output(",
+				"          quantity as integer '000'",
+				"     ),",
+				"     errors: true) ~> QuantityCast",
+				"QuantityCast derive(year = year(order_date),",
+				"          quarter = iif(month(order_date) <= 3, 1, iif(month(order_date) <= 6, 2, iif(month(order_date) <= 9, 3, 4)))) ~> derivedColumn1",
+				"ProductAggregate pivot(groupBy(product_id),",
+				"     pivotBy(year),",
+				"     {} = sum({No of times sold}),",
+				"     columnNaming: '$N$V',",
+				"     lateral: true) ~> pivot1",
+				"pivot1, Products join(product_id == id,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> ProdNameJoin",
+				"ProdNameJoin sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          brand_name as string,",
+				"          id as string,",
+				"          model_name as string,",
+				"          price as string,",
+				"          type as string,",
+				"          url as string",
+				"     ),",
+				"     partitionFileNames:['ProductAnalysis'],",
+				"     partitionBy('hash', 1)) ~> ProductsInsight"
+			]
+		}
+	}
+}

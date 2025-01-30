@@ -1,0 +1,107 @@
+{
+	"name": "AverageRevenue",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "TransactionsInput",
+						"type": "DatasetReference"
+					},
+					"name": "Transactions"
+				},
+				{
+					"dataset": {
+						"referenceName": "ProductsInput",
+						"type": "DatasetReference"
+					},
+					"name": "Products"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "output_data",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "innerJoin"
+				},
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "YearMonthAggregate"
+				},
+				{
+					"name": "window1"
+				},
+				{
+					"name": "derivedColumn2"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          order_id as string,",
+				"          transaction_id as string,",
+				"          customer_id as string,",
+				"          product_id as string,",
+				"          store_id as string,",
+				"          quantity as integer '000',",
+				"          order_date as date 'yyyy-MM-dd',",
+				"          payment_method as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> Transactions",
+				"source(output(",
+				"          brand_name as string,",
+				"          id as string,",
+				"          model_name as string,",
+				"          price as integer '000',",
+				"          type as string,",
+				"          url as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> Products",
+				"Transactions, Products join(product_id == id,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> innerJoin",
+				"innerJoin derive(Year = year(order_date),",
+				"          Month = month(order_date),",
+				"          Amount = multiply(quantity,price)) ~> derivedColumn1",
+				"derivedColumn2 aggregate(groupBy(Year,",
+				"          Month,",
+				"          Quarter),",
+				"     Revenue = sum(Amount)) ~> YearMonthAggregate",
+				"YearMonthAggregate window(over(Year,",
+				"          Quarter),",
+				"     asc(Quarter, true),",
+				"     {Average Revenue} = avg(Revenue)) ~> window1",
+				"derivedColumn1 derive(Quarter = iif(Month <= 3, 1, iif(Month <= 6, 2, iif(Month <= 9, 3, 4)))) ~> derivedColumn2",
+				"window1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          brand_name as string,",
+				"          id as string,",
+				"          model_name as string,",
+				"          price as string,",
+				"          type as string,",
+				"          url as string",
+				"     ),",
+				"     partitionFileNames:['AverageSales'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> sink1"
+			]
+		}
+	}
+}

@@ -1,0 +1,66 @@
+{
+	"name": "StoresSQL",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "SQLconnect",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "address",
+				"type": "varchar"
+			},
+			{
+				"name": "city",
+				"type": "varchar"
+			},
+			{
+				"name": "id",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "latitude",
+				"type": "decimal",
+				"precision": 10,
+				"scale": 7
+			},
+			{
+				"name": "longitude",
+				"type": "decimal",
+				"precision": 10,
+				"scale": 7
+			},
+			{
+				"name": "name",
+				"type": "varchar"
+			},
+			{
+				"name": "phone",
+				"type": "varchar"
+			},
+			{
+				"name": "rating",
+				"type": "decimal",
+				"precision": 2,
+				"scale": 1
+			},
+			{
+				"name": "reviews",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "type",
+				"type": "varchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "Stores"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

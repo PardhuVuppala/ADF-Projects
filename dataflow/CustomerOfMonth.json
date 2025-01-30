@@ -1,0 +1,121 @@
+{
+	"name": "CustomerOfMonth",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "TransactionsInput",
+						"type": "DatasetReference"
+					},
+					"name": "Transactions"
+				},
+				{
+					"dataset": {
+						"referenceName": "ProductsInput",
+						"type": "DatasetReference"
+					},
+					"name": "Products"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "output_data",
+						"type": "DatasetReference"
+					},
+					"name": "output"
+				}
+			],
+			"transformations": [
+				{
+					"name": "join1"
+				},
+				{
+					"name": "cast1"
+				},
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "aggregate1"
+				},
+				{
+					"name": "sort1"
+				},
+				{
+					"name": "window1"
+				},
+				{
+					"name": "filter1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          order_id as string,",
+				"          transaction_id as string,",
+				"          customer_id as string,",
+				"          product_id as string,",
+				"          store_id as string,",
+				"          quantity as string,",
+				"          order_date as string,",
+				"          payment_method as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> Transactions",
+				"source(output(",
+				"          brand_name as string,",
+				"          id as string,",
+				"          model_name as string,",
+				"          price as string,",
+				"          type as string,",
+				"          url as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> Products",
+				"Transactions, Products join(product_id == id,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> join1",
+				"join1 cast(output(",
+				"          quantity as integer '000',",
+				"          order_date as date 'yyyy-MM-dd',",
+				"          price as integer '000'",
+				"     ),",
+				"     errors: true) ~> cast1",
+				"cast1 derive(Amount = multiply(price,quantity),",
+				"          Year = year(order_date),",
+				"          Month = month(order_date)) ~> derivedColumn1",
+				"derivedColumn1 aggregate(groupBy(Year,",
+				"          Month,",
+				"          customer_id),",
+				"     {Total amount} = sum(Amount)) ~> aggregate1",
+				"aggregate1 sort(asc(Year, true),",
+				"     asc(Month, true)) ~> sort1",
+				"sort1 window(over(Year,",
+				"          Month),",
+				"     desc({Total amount}, true),",
+				"     Rank = denseRank()) ~> window1",
+				"window1 filter(Rank==1) ~> filter1",
+				"filter1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          brand_name as string,",
+				"          id as string,",
+				"          model_name as string,",
+				"          price as string,",
+				"          type as string,",
+				"          url as string",
+				"     ),",
+				"     partitionFileNames:['CustomerOfMonth'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> output"
+			]
+		}
+	}
+}
